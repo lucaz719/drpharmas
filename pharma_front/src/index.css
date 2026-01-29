@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+  
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  /* Ensure good print layout */
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a, a:visited {
+    text-decoration: underline;
+  }
+  
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  
+  /* Don't show links for images, or javascript/internal links */
+  .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+    content: "";
+  }
+  
+  pre, blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  
+  thead {
+    display: table-header-group;
+  }
+  
+  tr, img {
+    page-break-inside: avoid;
+  }
+  
+  img {
+    max-width: 100% !important;
+  }
+  
+  @page {
+    margin: 0.5in;
+  }
+  
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}
+
+/* Mobile Responsive Optimizations */
+@media (max-width: 768px) {
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  .mobile-full {
+    width: 100% !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-center {
+    text-align: center !important;
+  }
+}
+
+/* drpharmas Design System - Hospital Gradient Theme */
+
+@layer base {
+  :root {
+    /* drpharmas Theme - Hospital Gradients */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
+
+    /* Medical Panel Colors with Subtle Gradients */
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
+    --panel: 210 30% 97%;
+    --panel-foreground: 215 20% 25%;
+
+    /* Medical Primary - Healthcare Blue/Teal */
+    --primary: 200 95% 45%;
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 200 95% 40%;
+
+    /* Medical Secondary Colors */
+    --secondary: 180 25% 94%;
+    --secondary-foreground: 215 25% 15%;
+    --secondary-hover: 180 25% 90%;
+
+    /* Refined Muted Colors */
+    --muted: 210 20% 95%;
+    --muted-foreground: 215 15% 50%;
+
+    --accent: 180 30% 94%;
+    --accent-foreground: 215 25% 15%;
+
+    /* Medical Alert Colors */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --warning: 35 85% 55%;
+    --warning-foreground: 0 0% 15%;
+    --success: 145 70% 40%;
+    --success-foreground: 0 0% 98%;
+
+    /* Medical UI Elements */
+    --border: 210 20% 88%;
+    --input: 0 0% 100%;
+    --ring: 200 95% 45%;
+    --header: 215 30% 12%;
+    --header-foreground: 0 0% 98%;
+
+    /* Medical gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(200 95% 45%), hsl(180 85% 45%));
+    --gradient-panel: linear-gradient(180deg, hsl(210 30% 99%), hsl(210 20% 96%));
+    --gradient-header: linear-gradient(135deg, hsl(215 30% 12%), hsl(200 40% 18%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 15% 98%));
+
+    --radius: 8px;
+
+    --sidebar-background: 210 25% 98%;
+    --sidebar-foreground: 215 20% 25%;
+    --sidebar-primary: 200 95% 45%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 180 25% 94%;
+    --sidebar-accent-foreground: 215 25% 15%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 200 95% 45%;
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
+  }
+
+  .dark {
+    --background: 215 30% 8%;
+    --foreground: 210 20% 95%;
+
+    --card: 215 25% 10%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 215 25% 10%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 200 95% 50%;
+    --primary-foreground: 215 30% 8%;
+
+    --secondary: 215 20% 18%;
+    --secondary-foreground: 210 20% 95%;
+
+    --muted: 215 20% 18%;
+    --muted-foreground: 210 15% 65%;
+
+    --accent: 215 20% 18%;
+    --accent-foreground: 210 20% 95%;
+
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 210 20% 95%;
+
+    --border: 215 20% 20%;
+    --input: 215 20% 18%;
+    --ring: 200 95% 50%;
+    --sidebar-background: 215 30% 8%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 200 95% 50%;
+    --sidebar-primary-foreground: 215 30% 8%;
+    --sidebar-accent: 215 20% 18%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 215 20% 20%;
+    --sidebar-ring: 200 95% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground text-sm overflow-x-hidden;
+    font-size: 14px;
+    line-height: 1.4;
+    background: linear-gradient(180deg, hsl(210 20% 98%), hsl(210 30% 97%));
+    min-height: 100vh;
+  }
+  
+  h1 { @apply text-xl font-semibold; }
+  h2 { @apply text-lg font-semibold; }
+  h3 { @apply text-base font-medium; }
+  h4 { @apply text-sm font-medium; }
+
+  /* Ensure all input fields have borders */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"],
+  textarea,
+  select {
+    @apply border border-gray-300 bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 !important;
+  }
+
+  /* Force number inputs to have borders */
+  input[type="number"] {
+    @apply border border-gray-300 bg-transparent !important;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+  }
+
+  /* Hide number input spinners but keep functionality */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* drpharmas Gradient Utilities */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(200 95% 45%), hsl(180 85% 45%));
+  }
+  
+  .gradient-card {
+    background: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 15% 98%));
+  }
+  
+  .gradient-panel {
+    background: linear-gradient(180deg, hsl(210 30% 99%), hsl(210 20% 96%));
+  }
+  
+  .gradient-header {
+    background: linear-gradient(135deg, hsl(215 30% 12%), hsl(200 40% 18%));
+  }
+  
+  .medical-shadow {
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .medical-shadow-lg {
+    box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15), 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+}
