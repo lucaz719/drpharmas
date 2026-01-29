@@ -35,8 +35,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    ports:
-      - "8000:8000"
+    # Backend is served via Nginx on port 80, no need to expose 8000 to host
+    # ports:
+    #   - "8000:8000"
 
   frontend:
     build: ./pharma_front
