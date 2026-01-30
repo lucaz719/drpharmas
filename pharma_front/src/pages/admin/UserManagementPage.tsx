@@ -130,9 +130,27 @@ export default function UserManagementPage() {
       }
     } catch (error: any) {
       console.error(isEditMode ? 'Failed to update user:' : 'Failed to create user:', error);
+
+      const errorData = error.response?.data;
+      let errorMessage = isEditMode ? "Failed to update user" : "Failed to create user";
+
+      if (errorData?.error) {
+        errorMessage = errorData.error;
+      } else if (errorData?.errors) {
+        // Handle DRF serializer errors { errors: { field: [msg] } }
+        const errors = errorData.errors;
+        const firstField = Object.keys(errors)[0];
+        if (firstField) {
+          const fieldErrors = errors[firstField];
+          errorMessage = `${firstField}: ${Array.isArray(fieldErrors) ? fieldErrors[0] : fieldErrors}`;
+        }
+      } else if (errorData?.message) {
+        errorMessage = errorData.message;
+      }
+
       toast({
         title: "Error",
-        description: isEditMode ? "Failed to update user" : "Failed to create user",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

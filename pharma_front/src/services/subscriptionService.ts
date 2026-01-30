@@ -217,13 +217,7 @@ class SubscriptionService {
     return response.data;
   }
 
-  // Cancel subscription
-  async cancelSubscription(subscriptionId: number): Promise<OrganizationSubscription> {
-    const response = await apiClient.patch(`${this.baseUrl}/subscriptions/${subscriptionId}/`, {
-      status: 'cancelled'
-    });
-    return response.data;
-  }
+
 }
 
 export const subscriptionService = new SubscriptionService();

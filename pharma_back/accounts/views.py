@@ -349,8 +349,8 @@ def user_detail(request, user_id):
             })
         
         elif request.method == 'PUT':
-            from .serializers import UserSerializer
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            from .serializers import UserUpdateSerializer
+            serializer = UserUpdateSerializer(user, data=request.data, partial=True, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response({

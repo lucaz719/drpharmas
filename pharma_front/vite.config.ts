@@ -7,7 +7,16 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
-    port: 8080,
+    port: 8081,
+    proxy: {
+      '/auth': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/organizations': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/inventory': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/pos': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/patients': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/expenses': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+      '/media': { target: 'http://127.0.0.1:8000', changeOrigin: true },
+    },
     watch: {
       ignored: [
         '**/pharmacy_backend/**',

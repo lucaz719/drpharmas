@@ -38,6 +38,7 @@ interface OrganizationFormData {
   subscription_status: string;
   subscription_expiry: string;
   logo?: File;
+  status: string;
 }
 
 
@@ -82,6 +83,7 @@ export function OrganizationManagement() {
     subscription_status: 'active',
     subscription_expiry: '',
     logo: undefined,
+    status: 'pending',
   });
 
 
@@ -219,6 +221,7 @@ export function OrganizationManagement() {
       subscription_status: 'active',
       subscription_expiry: '',
       logo: undefined,
+      status: 'pending',
     });
     setSelectedPlan(null);
     setSelectedPricingTier(null);
@@ -233,11 +236,13 @@ export function OrganizationManagement() {
       setFormErrors({});
 
       // Validate required fields
+      const requiresPricingTier = selectedPlan?.pricing_tiers?.length > 0;
+
       if (!orgForm.name || !orgForm.email || !orgForm.address || !orgForm.license_number || !orgForm.license_expiry ||
-        !orgForm.city || !orgForm.state || !orgForm.postal_code || !orgForm.phone || !selectedPlan || !selectedPricingTier) {
+        !orgForm.city || !orgForm.state || !orgForm.postal_code || !orgForm.phone || !selectedPlan || (requiresPricingTier && !selectedPricingTier)) {
         toast({
           title: 'Validation Error',
-          description: 'Please fill in all required fields including subscription plan and pricing tier',
+          description: 'Please fill in all required fields including subscription plan',
           variant: 'destructive',
         });
         return;
@@ -264,6 +269,7 @@ export function OrganizationManagement() {
         subscription_plan: selectedPlan.name,
         subscription_status: 'active',
         subscription_expiry: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+        status: orgForm.status,
       };
 
       // Only include optional fields if they have values
@@ -379,11 +385,28 @@ export function OrganizationManagement() {
         });
       }
     } catch (error: any) {
+      console.error('Create Organization Error:', error);
       const errorData = error.response?.data;
       setFormErrors(errorData || {});
+
+      let errorMessage = 'Failed to action';
+      if (errorData?.error) {
+        errorMessage = errorData.error;
+      } else if (errorData && typeof errorData === 'object') {
+        // Extract first error message from DRF error object
+        const firstKey = Object.keys(errorData)[0];
+        if (firstKey && Array.isArray(errorData[firstKey])) {
+          errorMessage = `${firstKey}: ${errorData[firstKey][0]}`;
+        } else {
+          errorMessage = JSON.stringify(errorData);
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: 'Error',
-        description: errorData?.error || JSON.stringify(errorData) || 'Failed to action',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -419,7 +442,8 @@ export function OrganizationManagement() {
       subscription_plan: org.subscription_plan || 'basic',
       subscription_status: 'active',
       subscription_expiry: '',
-      logo: undefined
+      logo: undefined,
+      status: org.status || 'pending'
     });
 
     // Ideally we should fetch full details here, but for now this enables the edit dialog
@@ -584,6 +608,26 @@ export function OrganizationManagement() {
                   />
                   {formErrors.license_number && <span className="text-red-500 text-sm">{formErrors.license_number[0]}</span>}
                 </div>
+
+                {isEditMode && (
+                  <div className="space-y-2">
+                    <Label htmlFor="org-status">Status *</Label>
+                    <Select
+                      value={orgForm.status}
+                      onValueChange={(value) => setOrgForm({ ...orgForm, status: value })}
+                    >
+                      <SelectTrigger id="org-status" className="border">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="inactive">Inactive</SelectItem>
+                        <SelectItem value="suspended">Suspended</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="org-license-expiry">License Expiry *</Label>
@@ -765,7 +809,7 @@ export function OrganizationManagement() {
               </Button>
               <Button
                 onClick={handleCreateOrganization}
-                disabled={loading || !selectedPlan || !selectedPricingTier}
+                disabled={loading || !selectedPlan || (selectedPlan?.pricing_tiers?.length > 0 && !selectedPricingTier)}
               >
                 {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 {isEditMode ? 'Update Organization' : 'Create Organization'}
