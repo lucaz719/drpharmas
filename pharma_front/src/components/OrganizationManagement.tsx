@@ -262,23 +262,14 @@ export function OrganizationManagement() {
         formData.append('logo', orgForm.logo);
 
         // Use api instance for consistent base URL handling
-        const axiosResponse = await organizationsAPI.createOrganization(formData as any);
-        // Note: api.post handles the baseURL automatically from api.ts (which is '' in prod)
-        // But organizationsAPI.createOrganization wraps the call.
-        // Let's use the api instance directly for FormData to be safe and specific
-        // const response = await api.post('/organizations/', formData, {
-        //   headers: { 'Content-Type': 'multipart/form-data' },
-        // });
-
-        // Wait, organizationsAPI.createOrganization is defined as taking Partial<Organization>.
-        // Let's assume we can simply use the api instance directly here to avoid type conflicts with FormData vs JSON
+        // This ensures requests go to the correct relative path in production (proxied by Nginx)
         const apiResponse = await (await import('@/services/api')).default.post('/organizations/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         });
 
-        // Map response to match expected structure
+        // Map response to matches expected structure for downstream logic
         const axiosResponse = { data: apiResponse.data };
 
         // Handle backend response structure for FormData
