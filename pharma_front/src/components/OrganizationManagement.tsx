@@ -261,14 +261,25 @@ export function OrganizationManagement() {
         });
         formData.append('logo', orgForm.logo);
 
-        const axios = (await import('axios')).default;
-        const token = localStorage.getItem('access_token');
-        const axiosResponse = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/backend'}/organizations/`, formData, {
+        // Use api instance for consistent base URL handling
+        const axiosResponse = await organizationsAPI.createOrganization(formData as any);
+        // Note: api.post handles the baseURL automatically from api.ts (which is '' in prod)
+        // But organizationsAPI.createOrganization wraps the call.
+        // Let's use the api instance directly for FormData to be safe and specific
+        // const response = await api.post('/organizations/', formData, {
+        //   headers: { 'Content-Type': 'multipart/form-data' },
+        // });
+
+        // Wait, organizationsAPI.createOrganization is defined as taking Partial<Organization>.
+        // Let's assume we can simply use the api instance directly here to avoid type conflicts with FormData vs JSON
+        const apiResponse = await (await import('@/services/api')).default.post('/organizations/', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
-            ...(token && { Authorization: `Bearer ${token}` }),
           },
         });
+
+        // Map response to match expected structure
+        const axiosResponse = { data: apiResponse.data };
 
         // Handle backend response structure for FormData
         if (axiosResponse.data && axiosResponse.data.organization) {

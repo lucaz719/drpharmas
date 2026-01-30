@@ -1,0 +1,7 @@
+hostname: uat.nirc.com.np
+ssh port: 20241
+username: nircadmin
+Password: NircS3rv3r
+aru poni dharaikura haru xa ki
+cd /opt
+yo opt vetra

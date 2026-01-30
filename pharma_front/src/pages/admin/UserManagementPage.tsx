@@ -44,6 +44,8 @@ export default function UserManagementPage() {
     role: 'cashier',
     plain_text_password: ''
   });
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -71,8 +73,9 @@ export default function UserManagementPage() {
     }
   };
 
-  const handleAddUser = async () => {
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.plain_text_password) {
+  const handleSaveUser = async () => {
+    // Validation
+    if (!formData.first_name || !formData.last_name || !formData.email) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -81,16 +84,32 @@ export default function UserManagementPage() {
       return;
     }
 
+    // Password required only for new users
+    if (!isEditMode && !formData.plain_text_password) {
+      toast({
+        title: "Error",
+        description: "Password is required for new users",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setSubmitting(true);
-      const response = await usersAPI.createUser(formData);
-      
+
+      let response;
+      if (isEditMode && selectedUserId) {
+        response = await usersAPI.updateUser(selectedUserId, formData);
+      } else {
+        response = await usersAPI.createUser(formData);
+      }
+
       if (response.success) {
         toast({
           title: "Success",
           description: "User created successfully"
         });
-        
+
         // Reset form
         setFormData({
           first_name: '',
@@ -100,21 +119,20 @@ export default function UserManagementPage() {
           role: 'cashier',
           plain_text_password: ''
         });
-        
+
         setIsAddDialogOpen(false);
         fetchUsers(); // Reload users
       } else {
         toast({
           title: "Error",
-          description: response.message || "Failed to create user",
           variant: "destructive"
         });
       }
     } catch (error: any) {
-      console.error('Failed to create user:', error);
+      console.error(isEditMode ? 'Failed to update user:' : 'Failed to create user:', error);
       toast({
         title: "Error",
-        description: "Failed to create user",
+        description: isEditMode ? "Failed to update user" : "Failed to create user",
         variant: "destructive"
       });
     } finally {
@@ -124,7 +142,7 @@ export default function UserManagementPage() {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
+      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = roleFilter === "all" || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
@@ -139,6 +157,34 @@ export default function UserManagementPage() {
       cashier: "bg-orange-100 text-orange-800",
     };
     return colors[role as keyof typeof colors] || "bg-gray-100 text-gray-800";
+  };
+
+  const handleEditUser = (user: any) => {
+    setFormData({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      phone: user.phone || '',
+      role: user.role,
+      plain_text_password: '' // Don't populate password
+    });
+    setSelectedUserId(user.id);
+    setIsEditMode(true);
+    setIsAddDialogOpen(true);
+  };
+
+  const openAddDialog = () => {
+    setFormData({
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      role: 'cashier',
+      plain_text_password: ''
+    });
+    setSelectedUserId(null);
+    setIsEditMode(false);
+    setIsAddDialogOpen(true);
   };
 
   return (
@@ -158,16 +204,16 @@ export default function UserManagementPage() {
           </Button>
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2" onClick={openAddDialog}>
                 <UserPlus className="w-4 h-4" />
                 Add User
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Add New User</DialogTitle>
+                <DialogTitle>{isEditMode ? 'Edit User' : 'Add New User'}</DialogTitle>
                 <DialogDescription>
-                  Create a new user account with role and permissions
+                  {isEditMode ? 'Update user details and permissions' : 'Create a new user account with role and permissions'}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -177,7 +223,7 @@ export default function UserManagementPage() {
                     <Input
                       id="first_name"
                       value={formData.first_name}
-                      onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                       placeholder="John"
                     />
                   </div>
@@ -186,7 +232,7 @@ export default function UserManagementPage() {
                     <Input
                       id="last_name"
                       value={formData.last_name}
-                      onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                       placeholder="Doe"
                     />
                   </div>
@@ -197,7 +243,7 @@ export default function UserManagementPage() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="john.doe@example.com"
                   />
                 </div>
@@ -206,13 +252,13 @@ export default function UserManagementPage() {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="+1234567890"
                   />
                 </div>
                 <div>
                   <Label htmlFor="role">Role</Label>
-                  <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value})}>
+                  <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -231,8 +277,10 @@ export default function UserManagementPage() {
                     id="password"
                     type="password"
                     value={formData.plain_text_password}
-                    onChange={(e) => setFormData({...formData, plain_text_password: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, plain_text_password: e.target.value })}
                     placeholder="Enter password"
+                  />
+                  {isEditMode && <p className="text-xs text-muted-foreground mt-1">Leave blank to keep current password</p>}
                   />
                 </div>
               </div>
@@ -240,9 +288,9 @@ export default function UserManagementPage() {
                 <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleAddUser} disabled={submitting}>
+                <Button onClick={handleSaveUser} disabled={submitting}>
                   {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Add User
+                  {isEditMode ? 'Update User' : 'Add User'}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -369,7 +417,7 @@ export default function UserManagementPage() {
                       {user.status}
                     </Badge>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
                         <Edit className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
