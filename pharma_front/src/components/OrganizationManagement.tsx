@@ -198,6 +198,39 @@ export function OrganizationManagement() {
     }
   };
 
+  const resetForms = () => {
+    setOrgForm({
+      name: '',
+      type: 'retail_pharmacy',
+      medical_system: 'allopathic',
+      address: '',
+      city: 'Kathmandu',
+      state: 'Bagmati',
+      postal_code: '44600',
+      country: 'Nepal',
+      phone: '+977-1-234567',
+      email: '',
+      website: '',
+      license_number: '',
+      license_expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      tax_id: '',
+      registration_number: '',
+      currency: 'NPR',
+      tax_rate: '13.00',
+      timezone: 'Asia/Kathmandu',
+      language: 'en',
+      subscription_plan: 'basic',
+      subscription_status: 'active',
+      subscription_expiry: '',
+      logo: undefined,
+    });
+    setSelectedPlan(null);
+    setSelectedPricingTier(null);
+    setFormErrors({});
+    setIsEditMode(false);
+    setSelectedOrganization(null);
+  };
+
   const handleCreateOrganization = async () => {
     try {
       setLoading(true);
@@ -361,40 +394,6 @@ export function OrganizationManagement() {
       }
     };
 
-    const resetForms = () => {
-      setOrgForm({
-        name: '',
-        type: 'retail_pharmacy',
-        medical_system: 'allopathic',
-        address: '',
-        city: 'Kathmandu',
-        state: 'Bagmati',
-        postal_code: '44600',
-        country: 'Nepal',
-        phone: '+977-1-234567',
-        email: '',
-        website: '',
-        license_number: '',
-        license_expiry: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        tax_id: '',
-        registration_number: '',
-        currency: 'NPR',
-        tax_rate: '13.00',
-        timezone: 'Asia/Kathmandu',
-        language: 'en',
-        subscription_plan: 'basic',
-        subscription_status: 'active',
-        subscription_expiry: '',
-        logo: undefined,
-      });
-      setSelectedPlan(null);
-      setSelectedPricingTier(null);
-      setSelectedPlan(null);
-      setSelectedPricingTier(null);
-      setFormErrors({});
-      setIsEditMode(false);
-      setSelectedOrganization(null);
-    };
 
     const handleEditOrganization = (org: Organization) => {
       setSelectedOrganization(org);
