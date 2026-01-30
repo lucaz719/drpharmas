@@ -281,7 +281,6 @@ export default function UserManagementPage() {
                     placeholder="Enter password"
                   />
                   {isEditMode && <p className="text-xs text-muted-foreground mt-1">Leave blank to keep current password</p>}
-                  />
                 </div>
               </div>
               <DialogFooter>
